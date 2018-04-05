@@ -24,14 +24,18 @@
     "starter"
   ],
   "dependencies": {
+    "@types/colors": "^1.2.1",
     "@types/node": "^9.6.1",
     "@types/opn": "^5.1.0",
+    "@types/tar": "^4.0.0",
+    "colors": "^1.2.1",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.4",
     "github-latest-release": "^0.1.1",
     "isdir-async": "^1.0.0",
     "plylog": "^0.4.0",
-    "resolve": "^1.6.0"
+    "resolve": "^1.6.0",
+    "tar": "^4.4.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",

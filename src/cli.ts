@@ -7,8 +7,11 @@ import * as fs from 'fs';
 import latest = require('github-latest-release');
 import {args} from './args';
 import {fetchOptions, fetchBase, fetch} from './fetch';
+import * as tar from 'tar';
+import * as colors from 'colors';
 
-
+// initializing ?
+colors.green('');
 
 export async function run() {
   const argsWithHelp: ArgDescriptor[] = args.concat(
@@ -48,10 +51,29 @@ export async function run() {
   }
 
   /**
+   * We fetch the version if we request for 'last'
+   */
+  let version: string = cliOptions.version;
+  if (version === 'last') {
+    console.info('Fetching the version informations...');
+    let info;
+    try {
+      info = await latest(options.user, options.starter);
+    } catch (err) {
+      console.log('The repository couldn\'t be found');
+      return;
+    }
+    options.version = info.tag_name;
+    console.info(`Version fetched (${info.tag_name}).`);
+  }
+
+
+
+  /**
    * Let's create the directory or throw an Error if it already exist.
    */
   if (fs.existsSync(options.appName)) {
-    console.error('Can\'t create the directory, it already exists.');
+    console.error('Can\'t create the directory, it already exists.'.red);
     return;
   } else {
     try {
@@ -59,41 +81,56 @@ export async function run() {
       process.chdir(options.appName);
     } catch (e) {
       console.error(
-          'Couldn\'t make the directory. Verify you have the rights to write.');
+          'Couldn\'t make the directory. Verify you have the rights to write.'
+              .red);
       return;
     }
   }
-
-  /**
-   * We fetch the version if we request for 'last'
-   */
-  let version: string = cliOptions.version;
-  if (version === 'last') {
-    console.info('Fetching the version informations...');
-    const info = await latest(options.user, options.starter);
-    options.version = info.tag_name;
-    console.info(`Version fetched (${info.tag_name}).`);
-  }
-
+  console.info('Creating the directory... OK');
 
   /**
    * We fetch the package
    */
-  console.info(
-      `Fetching "${fetchBase}/${options.user}/${options.starter}/tar.gz/${options.version}"..`);
   let filepath;
   try {
-    filepath = await fetch(options, options.appName);
+    // we've changed the cwd, so the path is currently the current directory,
+    // hence '.'
+    filepath = await fetch(options, '.');
   } catch (err) {
     console.error(
-        'Couldn\'t fetch the package. It may not exist or your connection dropped. Try again.');
+        'Couldn\'t fetch the package. It may not exist or your connection dropped. Try again.'
+            .red);
     process.chdir('..');
     fs.unlinkSync(options.appName);
     return;
   }
+  console.info(
+      `Fetching "${fetchBase}/${options.user}/${options.starter}/tar.gz/${options.version}"... OK`);
 
 
-  filepath;
+  /**
+   * We extract the package
+   */
+  try {
+    await tar.x({file: filepath, strip: 1});
+  } catch (err) {
+    console.error(
+        'An error occured while trying to unpack the archive. Corrupted ?'.red);
+    process.chdir('..');
+    fs.unlinkSync(options.appName);
+    return;
+  }
+  console.info('Unpacking the archive... OK');
+
+  /**
+   * Removing the archive
+   */
+  fs.unlinkSync(filepath);
+  console.info('Deleting the archive... OK');
+
+  console.info(
+      `\n Success! The starter is waiting in '${options.appName}'`.green);
+  return;
 }
 
 
