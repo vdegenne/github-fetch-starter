@@ -1,25 +1,70 @@
 
+import {createWriteStream} from 'fs';
 import {IncomingMessage} from 'http';
 import * as https from 'https';
+import * as Path from 'path';
 import * as logging from 'plylog';
+
 
 const logger = logging.getLogger('fetch.main');
 
 
-export async function fetch(url: string): Promise<IncomingMessage> {
-  logger.info(`Fetching "${url}"`);
 
-  let response: IncomingMessage;
-  response = await get(url);
-  logger.info(response.statusCode.toString());
-
-  return response;
+export interface fetchOptions {
+  user: string;
+  starter: string;
+  version: string;
+  appName: string
 }
 
-async function get(url: string) {
-  let response;
-  https.get(url, (res: IncomingMessage) => {response = res});
-  return response;
+
+
+export const fetchBase = 'https://codeload.github.com/';
+
+
+
+export function fetch(options: fetchOptions, path: string): Promise<string> {
+  return new Promise(async(resolve, reject) => {
+    const url = fetchBase.concat(
+        `${options.user}/${options.starter}/tar.gz/${options.version}`);
+
+    let response: IncomingMessage;
+    try {
+      logger.debug(`Fetch ${url}`);
+      response = await get(url);
+    } catch (err) {
+      reject(err);
+      return;
+    }
+
+    if (response.statusCode) {
+      logger.debug('statusCode : ', response.statusCode.toString());
+    }
+
+
+    if (response.statusCode == 200) {
+      path = Path.resolve(path, options.version + '.tar.gz');
+      let stream = createWriteStream(path);
+      response.pipe(stream);
+
+      stream.on('finish', () => resolve(path))
+    } else {
+      reject(new Error('The starter doesn\'t exist. Please verify the name.'));
+    }
+  })
+}
+
+
+
+function get(url: string): Promise<IncomingMessage> {
+  return new Promise((resolve, reject) => {
+    const cr = https.get(url, (res: IncomingMessage) => {
+      resolve(res);
+    });
+    cr.on('error', (e: Error) => {
+      reject(e);
+    });
+  });
 }
 
 /* await fetch()

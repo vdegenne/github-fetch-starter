@@ -3,17 +3,11 @@
 import * as commandLineArgs from 'command-line-args';
 import {ArgDescriptor} from 'command-line-args';
 import * as commandLineUsage from 'command-line-usage';
-
-var latest = require('github-latest-release');
+import * as fs from 'fs';
+import latest = require('github-latest-release');
 import {args} from './args';
+import {fetchOptions, fetchBase, fetch} from './fetch';
 
-
-export interface Options {
-  user: string;
-  starter: string;
-  version: string;
-  'app-name': string
-}
 
 
 export async function run() {
@@ -42,34 +36,64 @@ export async function run() {
     return;
   }
 
-
-
-  const options: Options = {
+  const options: fetchOptions = {
     user: cliOptions.user,
     starter: cliOptions.starter,
-    'app-name': cliOptions['app-name'],
+    appName: cliOptions['app-name'],
     version: cliOptions.version
   }
 
-  if (!options['app-name']) {
-    options['app-name'] = options.starter;
+  if (!options.appName) {
+    options.appName = options.starter;
   }
 
+  /**
+   * Let's create the directory or throw an Error if it already exist.
+   */
+  if (fs.existsSync(options.appName)) {
+    console.error('Can\'t create the directory, it already exists.');
+    return;
+  } else {
+    try {
+      fs.mkdirSync(options.appName);
+      process.chdir(options.appName);
+    } catch (e) {
+      console.error(
+          'Couldn\'t make the directory. Verify you have the rights to write.');
+      return;
+    }
+  }
+
+  /**
+   * We fetch the version if we request for 'last'
+   */
   let version: string = cliOptions.version;
   if (version === 'last') {
-    console.log('Fetch the version informations......');
-    await latest(options.user, options['app-name']).then((info: any) => {
-      console.log(`Version fetched (${info.tag_name}).`);
-      options.version = info.tag_name;
-    })
+    console.info('Fetching the version informations...');
+    const info = await latest(options.user, options.starter);
+    options.version = info.tag_name;
+    console.info(`Version fetched (${info.tag_name}).`);
   }
 
 
+  /**
+   * We fetch the package
+   */
+  console.info(
+      `Fetching "${fetchBase}/${options.user}/${options.starter}/tar.gz/${options.version}"..`);
+  let filepath;
+  try {
+    filepath = await fetch(options, options.appName);
+  } catch (err) {
+    console.error(
+        'Couldn\'t fetch the package. It may not exist or your connection dropped. Try again.');
+    process.chdir('..');
+    fs.unlinkSync(options.appName);
+    return;
+  }
 
-  // download the distant file
-  console.log('Downloading the package.......');
 
-  // wait for the file to be fetched
+  filepath;
 }
 
 
