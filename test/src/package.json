@@ -1,0 +1,5 @@
+{
+  "name": "%appname%",
+  "description": "this is a test",
+  "typings": "lib/%appname%.d.ts"
+}

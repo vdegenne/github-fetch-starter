@@ -1,0 +1,1 @@
+/* %appname%_test.ts */
