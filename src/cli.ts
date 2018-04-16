@@ -9,6 +9,7 @@ import {args} from './args';
 import {fetchOptions, fetchBase, fetch} from './fetch';
 import * as tar from 'tar';
 import * as colors from 'colors';
+import {masterReplace} from './replacer';
 
 // initializing ?
 colors.green('');
@@ -130,6 +131,18 @@ export async function run() {
 
   console.info(
       `\n Success! The starter is waiting in '${options.appName}'`.green);
+
+
+  /**
+   * Let's replace what needs to be replaced.
+   *
+   */
+  // todo: later we could add custom replacements to search for in the fetched
+  // starter.
+  // for now it will just replace `%appname%` in the filenames and inside file's
+  // content with the name of the application provided.
+  masterReplace(process.cwd(), {'appname': options.appName});
+
   return;
 }
 
