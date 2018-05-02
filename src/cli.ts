@@ -62,8 +62,7 @@ export async function run() {
     try {
       info = await latest(options.user, options.starter);
     } catch (e) {
-      console.error('The repository couldn\'t be found'.red);
-      return;
+      throw new Error('The repository couldn\'t be found'.red);
     }
     options.version = info.tag_name;
     console.info(`Version fetched (${info.tag_name}).`);
@@ -136,7 +135,7 @@ export async function run() {
    *
    */
   const placeholders = {
-    appname: options.appName
+    'appname': options.appName
   };
 
   if (cliOptions.placeholder) {
@@ -147,6 +146,7 @@ export async function run() {
   }
 
   // time to replace the placeholders
+  console.log(placeholders);
   await masterReplace(process.cwd(), placeholders);
   console.info('Replacing the placeholders... OK');
 

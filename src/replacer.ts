@@ -12,28 +12,32 @@ export interface Replacements { [from: string]: string }
  * the placeholder.
  * It doesn't replace the placeholders in directory names.
  */
-export async function masterReplace(
-  rootpath: string, replacements: Replacements): Promise<void | Error> {
+export function masterReplace(
+  rootpath: string, replacements: Replacements): Promise<{}> | Error {
 
-  const files = fs.readdirSync(rootpath);
-  for (const f of files) {
-    const filepath = path.join(rootpath, f);
-    // in the case of a directory
-    if (fs.lstatSync(filepath).isDirectory()) {
-      return masterReplace(filepath, replacements); // recursive
-    } else {
-      // if it is a file
-      // we try to replace the filename and placeholders in the content
-      try {
-        const newfilepath = await replaceInFilename(filepath, replacements);
-        await replaceInFile(newfilepath, replacements);
-      } catch (err) {
-        throw err;
+  return new Promise(async (resolve, reject) => {
+
+    const files = fs.readdirSync(rootpath);
+    for (const f of files) {
+      const filepath = path.join(rootpath, f);
+      // in the case of a directory
+      if (fs.lstatSync(filepath).isDirectory()) {
+        await masterReplace(filepath, replacements); // recursive
+      } else {
+        // if it is a file
+        // we try to replace the filename and placeholders in the content
+        try {
+          const newfilepath = await replaceInFilename(filepath, replacements);
+          await replaceInFile(newfilepath, replacements);
+        } catch (err) {
+          throw err;
+        }
       }
     }
-  }
 
-  return;
+    resolve();
+  });
+
 }
 
 

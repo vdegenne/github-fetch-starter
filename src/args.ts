@@ -32,6 +32,7 @@ export const args: ArgDescriptor[] = [
   },
   {
     name: 'placeholder',
+    description: 'placeholders of this form key=value',
     alias: 'p',
     type: String,
     multiple: true

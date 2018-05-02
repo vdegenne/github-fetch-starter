@@ -7,6 +7,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/bin/github-fetch-starter",
+      "args": [
+        "-n",
+        "thisisatest",
+        "-p",
+        "dbuser=asdf",
+        "node-typescript-starter"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Mocha Tests",
       "program": "${workspaceFolder}/node_modules/.bin/_mocha",
       "outFiles": [],

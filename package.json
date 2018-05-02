@@ -1,6 +1,6 @@
 {
   "name": "github-fetch-starter",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A github starter fetcher.",
   "repository": "vdegenne/github-fetch-starter",
   "main": "lib/github-fetch-starter",
@@ -34,15 +34,15 @@
     "tar": "^4.4.1"
   },
   "devDependencies": {
-    "@types/colors": "^1.2.1",
-    "@types/node": "^9.6.1",
-    "@types/opn": "^5.1.0",
-    "@types/tar": "^4.0.0",
     "@types/chai": "^4.1.2",
     "@types/chai-as-promised": "^7.1.0",
+    "@types/colors": "^1.2.1",
     "@types/fs-extra": "^5.0.2",
     "@types/mocha": "^5.0.0",
     "@types/ncp": "^2.0.1",
+    "@types/node": "^9.6.1",
+    "@types/opn": "^5.1.0",
+    "@types/tar": "^4.0.0",
     "@types/uuid": "^3.4.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",

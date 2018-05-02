@@ -91,13 +91,14 @@ describe('Replacer', () => {
     it('masterReplace replaces placeholders in file', async () => {
       // call the masterReplace function
       await replacer.masterReplace(
-        tempRoot, { 'appname': 'myprojectname', 'testvalue': 'test' });
+        tempRoot, { 'appname': 'myprojectname', 'testvalue': 'hello' });
 
       // get the content of package.json
-      const content = fs.readFileSync(pkgFile);
+      const content = fs.readFileSync(tempRoot + '/myprojectname.ts');
 
       // assert the replacement is found
       assert.isAtLeast(content.toString().indexOf('myprojectname'), 0);
+      assert.isAtLeast(content.toString().indexOf('hello'), 0);
     });
 
 
