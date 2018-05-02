@@ -1,7 +1,12 @@
 .vscode
+custom_typings
 node_modules
 src/test
 test
 .clang-format
 .gitignore
+.npmignore
 .travis.yml
+CHANGELOG.md
+package-lock.json
+yarn.lock
