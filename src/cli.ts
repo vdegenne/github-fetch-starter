@@ -146,7 +146,6 @@ export async function run() {
   }
 
   // time to replace the placeholders
-  console.log(placeholders);
   await masterReplace(process.cwd(), placeholders);
   console.info('Replacing the placeholders... OK');
 
