@@ -9,6 +9,7 @@
     "github-fetch-starter": "bin/github-fetch-starter"
   },
   "scripts": {
+    "start": "./bin/github-fetch-starter",
     "clean": "rimraf lib",
     "build": "yarn clean && tsc",
     "test": "yarn build && mocha",

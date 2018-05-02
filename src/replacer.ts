@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
 import * as path from 'path';
 import * as stream from 'stream';
 
@@ -11,40 +12,28 @@ export interface Replacements { [from: string]: string }
  * the placeholder.
  * It doesn't replace the placeholders in directory names.
  */
-export function masterReplace(
-    rootpath: string, replacements: Replacements): Promise<void|Error> {
-  return new Promise(async(resolve, reject) => {
-    const files = fs.readdirSync(rootpath);
-    for (const f of files) {
-      const filepath = path.join(rootpath, f);
-      // in the case of a directory
-      if (fs.lstatSync(filepath).isDirectory()) {
-        masterReplace(filepath, replacements)
-            .then(() => {
-              resolve();
-            })
-            .catch((err) => {
-              reject(err);
-            })
-      } else {  // if it is a file
-        // we try to replace the name if any placeholder
-        replaceInFilename(filepath, replacements)
-            .then((filepath) => {
-              // then we try to replace any placeholder inside
-              replaceInFile(filepath, replacements)
-                  .then(() => {
-                    resolve();
-                  })
-                  .catch((err) => {
-                    reject(err);
-                  });
-            })
-            .catch((err) => {
-              reject(err);
-            });
+export async function masterReplace(
+  rootpath: string, replacements: Replacements): Promise<void | Error> {
+
+  const files = fs.readdirSync(rootpath);
+  for (const f of files) {
+    const filepath = path.join(rootpath, f);
+    // in the case of a directory
+    if (fs.lstatSync(filepath).isDirectory()) {
+      return masterReplace(filepath, replacements); // recursive
+    } else {
+      // if it is a file
+      // we try to replace the filename and placeholders in the content
+      try {
+        const newfilepath = await replaceInFilename(filepath, replacements);
+        await replaceInFile(newfilepath, replacements);
+      } catch (err) {
+        throw err;
       }
     }
-  });
+  }
+
+  return;
 }
 
 
@@ -53,7 +42,8 @@ export function masterReplace(
  * returns the name of the new filepath, changed or not.
  */
 export async function replaceInFilename(
-    filepath: string, replacements: Replacements): Promise<string> {
+  filepath: string, replacements: Replacements): Promise<string> {
+
   if (!fs.existsSync(filepath)) {
     throw new Error('The file doesn\'t exist.');
   }
@@ -85,29 +75,35 @@ export async function replaceInFilename(
  *
  */
 export function replaceInFile(
-    filepath: string, replacements: Replacements): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(filepath)) {
-      throw new Error('The file doesn\'t exist.');
-    }
+  filepath: string, replacements: Replacements): Promise<{}> | Error {
 
-    // if the file exists
-    // let's prepare the replacer
-    const replacer = new FileReplacerTransformer(replacements);
-    // we create the readStream from the file
-    const file = fs.createReadStream(filepath);
+  let resolve: any;
+  const promise = new Promise((res, rej) => resolve = res);
 
-    // we do the piping with the tranformer
-    file.pipe(replacer);
-    file.on('end', () => {
-      // we can replace the original file with the new content
-      const file = fs.createWriteStream(filepath);
-      replacer.pipe(file);
-      file.on('finish', () => {
-        resolve();
-      });
+  if (!fs.existsSync(filepath)) {
+    throw new Error('The file doesn\'t exist.');
+  }
+
+  // if the file exists
+  // let's prepare the replacer
+  const replacer = new FileReplacerTransformer(replacements);
+  // we create the readStream from the file
+  const file = createReadStream(filepath);
+
+
+  replacer.on('finish', function () {
+    // we can replace the original file with the new content
+    const file = createWriteStream(filepath);
+    replacer.pipe(file);
+    file.on('finish', function () {
+      resolve();
     });
   });
+
+  // we do the piping with the tranformer
+  file.pipe(replacer);
+
+  return promise;
 }
 
 
@@ -115,7 +111,7 @@ export function replaceInFile(
  *
  */
 export class FileReplacerTransformer extends stream.Transform {
-  private replacements: {from: RegExp, to: string}[];
+  private replacements: { from: RegExp, to: string }[];
 
   constructor(replacements: Replacements, opts?: stream.TransformOptions) {
     super(opts);

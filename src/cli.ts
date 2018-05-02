@@ -1,22 +1,23 @@
 /// <reference path="../custom_typings/command-line-args.d.ts" />
 
 import * as commandLineArgs from 'command-line-args';
-import {ArgDescriptor} from 'command-line-args';
+import { ArgDescriptor } from 'command-line-args';
 import * as commandLineUsage from 'command-line-usage';
 import * as fs from 'fs';
 import latest = require('github-latest-release');
-import {args} from './args';
-import {fetchOptions, fetchBase, fetch} from './fetch';
+import { args } from './args';
+import { fetchOptions, fetchBase, fetch } from './fetch';
 import * as tar from 'tar';
 import * as colors from 'colors';
-import {masterReplace} from './replacer';
+import { masterReplace } from './replacer';
 
 // initializing ?
 colors.green('');
 
 export async function run() {
+
   const argsWithHelp: ArgDescriptor[] = args.concat(
-      {name: 'help', description: 'Shows this help message', type: Boolean});
+    { name: 'help', description: 'Shows this help message', type: Boolean });
 
   let cliOptions: any;
 
@@ -32,8 +33,9 @@ export async function run() {
     return;
   }
 
+
   /**
-   * Start your program HERE
+   * Start
    */
   if (!cliOptions.starter) {
     printUsage(argsWithHelp);
@@ -54,14 +56,13 @@ export async function run() {
   /**
    * We fetch the version if we request for 'last'
    */
-  let version: string = cliOptions.version;
-  if (version === 'last') {
+  if (options.version === 'last') {
     console.info('Fetching the version informations...');
     let info;
     try {
       info = await latest(options.user, options.starter);
-    } catch (err) {
-      console.log('The repository couldn\'t be found');
+    } catch (e) {
+      console.error('The repository couldn\'t be found'.red);
       return;
     }
     options.version = info.tag_name;
@@ -82,8 +83,8 @@ export async function run() {
       process.chdir(options.appName);
     } catch (e) {
       console.error(
-          'Couldn\'t make the directory. Verify you have the rights to write.'
-              .red);
+        'Couldn\'t make the directory. Verify you have the rights to write.'
+          .red);
       return;
     }
   }
@@ -99,24 +100,24 @@ export async function run() {
     filepath = await fetch(options, '.');
   } catch (err) {
     console.error(
-        'Couldn\'t fetch the package. It may not exist or your connection dropped. Try again.'
-            .red);
+      'Couldn\'t fetch the package. It may not exist or your connection dropped. Try again.'
+        .red);
     process.chdir('..');
     fs.unlinkSync(options.appName);
     return;
   }
   console.info(
-      `Fetching "${fetchBase}/${options.user}/${options.starter}/tar.gz/${options.version}"... OK`);
+    `Fetching "${fetchBase}/${options.user}/${options.starter}/tar.gz/${options.version}"... OK`);
 
 
   /**
    * We extract the package
    */
   try {
-    await tar.x({file: filepath, strip: 1});
+    await tar.x({ file: filepath, strip: 1 });
   } catch (err) {
     console.error(
-        'An error occured while trying to unpack the archive. Corrupted ?'.red);
+      'An error occured while trying to unpack the archive. Corrupted ?'.red);
     process.chdir('..');
     fs.unlinkSync(options.appName);
     return;
@@ -129,20 +130,29 @@ export async function run() {
   fs.unlinkSync(filepath);
   console.info('Deleting the archive... OK');
 
-  console.info(
-      `\n Success! The starter is waiting in '${options.appName}'`.green);
-
 
   /**
    * Let's replace what needs to be replaced.
    *
    */
-  // todo: later we could add custom replacements to search for in the fetched
-  // starter.
-  // for now it will just replace `%appname%` in the filenames and inside file's
-  // content with the name of the application provided.
-  masterReplace(process.cwd(), {'appname': options.appName});
+  const placeholders = {
+    appname: options.appName
+  };
 
+  if (cliOptions.placeholder) {
+    for (const p of cliOptions.placeholder) {
+      const parts = p.split('=');
+      placeholders[parts[0]] = parts[1];
+    }
+  }
+
+  // time to replace the placeholders
+  await masterReplace(process.cwd(), placeholders);
+  console.info('Replacing the placeholders... OK');
+
+
+  console.info(
+    `\n Success! The starter is waiting in '${options.appName}'`.green);
   return;
 }
 
@@ -154,7 +164,7 @@ function printUsage(options: any): void {
       header: 'Usage',
       content: 'github-fetch-starter [options ...] <starter-name>'
     },
-    {header: 'Options', optionList: options}
+    { header: 'Options', optionList: options }
   ];
   console.log(commandLineUsage(usage));
 }

@@ -1,5 +1,5 @@
 /// <reference path="../custom_typings/command-line-args.d.ts" />
-import {ArgDescriptor} from 'command-line-args';
+import { ArgDescriptor } from 'command-line-args';
 
 export const args: ArgDescriptor[] = [
   {
@@ -12,7 +12,7 @@ export const args: ArgDescriptor[] = [
   {
     name: 'starter',
     description:
-        'The name of the remote starter. Basically the user\'s repository name you want to clone.',
+      'The name of the remote starter. Basically the user\'s repository name you want to clone.',
     type: String,
     defaultOption: true
   },
@@ -20,7 +20,7 @@ export const args: ArgDescriptor[] = [
     name: 'version',
     alias: 'v',
     description:
-        'The version of the remote starter. If not specified, defaults to last version.',
+      'The version of the remote starter. If not specified, defaults to last version.',
     type: String,
     defaultValue: 'last'
   },
@@ -29,5 +29,11 @@ export const args: ArgDescriptor[] = [
     alias: 'n',
     description: 'Your app name as it\'ll appear in the file-system',
     type: String
+  },
+  {
+    name: 'placeholder',
+    alias: 'p',
+    type: String,
+    multiple: true
   }
 ];
