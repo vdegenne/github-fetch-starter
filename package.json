@@ -1,6 +1,6 @@
 {
   "name": "github-fetch-starter",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "A github starter fetcher.",
   "repository": "vdegenne/github-fetch-starter",
   "main": "lib/github-fetch-starter",
