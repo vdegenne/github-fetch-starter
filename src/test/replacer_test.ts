@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { Readable, Writable } from 'stream';
+import {Readable, Writable} from 'stream';
 
 import * as replacer from '../replacer';
 
@@ -26,7 +26,7 @@ describe('Replacer', () => {
 
       // create the transform stream
       const tranformer = new replacer.FileReplacerTransformer(
-        { 'placeholder': 'great', 'adjective': 'very' });
+          {'placeholder': 'great', 'adjective': 'very'});
 
       // create the outstream
       const outstream = new Writable;
@@ -60,15 +60,13 @@ describe('Replacer', () => {
       pkgFile = path.join(tempRoot, 'package.json');
     });
 
-    afterEach(() => {
-      fs.removeSync(tempRoot);
-    });
+    afterEach(() => { fs.removeSync(tempRoot); });
 
 
-    it('replaces placeholders in file', async () => {
+    it('replaces placeholders in file', async() => {
 
       // replace placeholder in the package.json
-      await replacer.replaceInFile(pkgFile, { 'appname': 'myprojectname' });
+      await replacer.replaceInFile(pkgFile, {'appname': 'myprojectname'});
 
       // read-back the new content
       const content = fs.readFileSync(pkgFile);
@@ -77,10 +75,10 @@ describe('Replacer', () => {
       assert.isAtLeast(content.toString().indexOf('myprojectname'), 0);
     });
 
-    it('replaces placeholder in filenames', async () => {
+    it('replaces placeholder in filenames', async() => {
       const filepath = path.join(tempRoot, '%appname%.ts');
       const newfilepath = path.join(tempRoot, 'myprojectname.ts');
-      replacer.replaceInFilename(filepath, { 'appname': 'myprojectname' });
+      replacer.replaceInFilename(filepath, {'appname': 'myprojectname'});
       // the file shouldn't exist anymore
       assert.isFalse(fs.existsSync(filepath));
       // myprojectname.ts should exist
@@ -88,10 +86,10 @@ describe('Replacer', () => {
     });
 
 
-    it('masterReplace replaces placeholders in file', async () => {
+    it('masterReplace replaces placeholders in file', async() => {
       // call the masterReplace function
       await replacer.masterReplace(
-        tempRoot, { 'appname': 'myprojectname', 'testvalue': 'hello' });
+          tempRoot, {'appname': 'myprojectname', 'testvalue': 'hello'});
 
       // get the content of package.json
       const content = fs.readFileSync(tempRoot + '/myprojectname.ts');
@@ -102,11 +100,11 @@ describe('Replacer', () => {
     });
 
 
-    it('masterReplace replaces filenames', async () => {
+    it('masterReplace replaces filenames', async() => {
       const filepath = path.join(tempRoot, '%appname%.ts');
       const newfilepath = path.join(tempRoot, 'myprojectname.ts');
       // call the masterReplace function
-      await replacer.masterReplace(tempRoot, { 'appname': 'myprojectname' });
+      await replacer.masterReplace(tempRoot, {'appname': 'myprojectname'});
       // the file `%name%.ts` should be absent
       assert.isFalse(fs.existsSync(filepath));
       // and the file `myprojectname.ts` should be present
