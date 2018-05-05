@@ -1,6 +1,6 @@
 # Change Log
 
-## v1.3.0 ([commit]())
+## v1.4.0 ([commit](https://github.com/vdegenne/github-fetch-starter/commit/f20ea38f7c013678c41a6c89a11aed9aaab0153a))
 
 * Add `readline-sync` support for asking placeholders' value directly into the command-line.
 
