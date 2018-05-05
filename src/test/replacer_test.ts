@@ -110,5 +110,10 @@ describe('Replacer', () => {
       // and the file `myprojectname.ts` should be present
       assert.isTrue(fs.existsSync(newfilepath));
     });
+
+    it('finds all placeholders in project (distinct)', async() => {
+      const findings = await replacer.getProjectPlaceholders(tempRoot);
+      assert.deepEqual(findings, ['appname', 'testvalue']);
+    });
   });
 });

@@ -1,6 +1,6 @@
 
-import { createWriteStream } from 'fs';
-import { IncomingMessage } from 'http';
+import {createWriteStream} from 'fs';
+import {IncomingMessage} from 'http';
 import * as https from 'https';
 import * as Path from 'path';
 import * as logging from 'plylog';
@@ -14,7 +14,7 @@ export interface fetchOptions {
   user: string;
   starter: string;
   version: string;
-  appName: string;
+  appname: string;
 }
 
 
@@ -24,9 +24,9 @@ export const fetchBase = 'https://codeload.github.com/';
 
 
 export function fetch(options: fetchOptions, path: string): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async(resolve, reject) => {
     const url = fetchBase.concat(
-      `${options.user}/${options.starter}/tar.gz/${options.version}`);
+        `${options.user}/${options.starter}/tar.gz/${options.version}`);
 
     let response: IncomingMessage;
     try {
@@ -58,12 +58,8 @@ export function fetch(options: fetchOptions, path: string): Promise<string> {
 
 function get(url: string): Promise<IncomingMessage> {
   return new Promise((resolve, reject) => {
-    const cr = https.get(url, (res: IncomingMessage) => {
-      resolve(res);
-    });
-    cr.on('error', (e: Error) => {
-      reject(e);
-    });
+    const cr = https.get(url, (res: IncomingMessage) => { resolve(res); });
+    cr.on('error', (e: Error) => { reject(e); });
   });
 }
 

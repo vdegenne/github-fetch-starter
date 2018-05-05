@@ -1,5 +1,5 @@
 import {createReadStream, createWriteStream, existsSync, lstatSync, readFileSync, readdirSync, renameSync, unlinkSync} from 'fs';
-import * as path from 'path';
+import {basename, dirname, join, resolve} from 'path';
 import * as stream from 'stream';
 
 
@@ -19,7 +19,7 @@ export function masterReplace(
 
     for (let i = 0, length = files.length; i < length; ++i) {
       const f = files[i];
-      const filepath = path.join(rootpath, f);
+      const filepath = join(rootpath, f);
       // in the case of a directory
       if (lstatSync(filepath).isDirectory()) {
         await masterReplace(filepath, replacements);
@@ -49,8 +49,8 @@ export async function replaceInFilename(
 
   let replacement: string, replaceRegExp: RegExp;
   // paths and names
-  const dirpath = path.dirname(filepath);
-  const filename = path.basename(filepath);
+  const dirpath = dirname(filepath);
+  const filename = basename(filepath);
   let newfilename: string = '';  // this is the name of the file if renamed
 
   for (replacement in replacements) {
@@ -60,7 +60,7 @@ export async function replaceInFilename(
       newfilename = filename.replace(replaceRegExp, replacements[replacement]);
 
       // we should move the file from here.
-      renameSync(filepath, path.join(dirpath, newfilename));
+      renameSync(filepath, join(dirpath, newfilename));
     }
   }
 
@@ -68,7 +68,7 @@ export async function replaceInFilename(
     // the filename is the same
     newfilename = filename;
   }
-  return path.resolve(dirpath, newfilename);
+  return resolve(dirpath, newfilename);
 }
 /**
  *
@@ -138,4 +138,25 @@ export class FileReplacerTransformer extends stream.Transform {
     this.push(newChunk);
     callback();
   }
+}
+
+
+export async function getProjectPlaceholders(path: string): Promise<string[]> {
+  let placeholders: string[] = [];
+  const files = readdirSync(path);
+  for (const f of files) {
+    const filepath = join(path, f);
+    if (lstatSync(filepath).isDirectory()) {
+      placeholders =
+          placeholders.concat(await getProjectPlaceholders(filepath));
+    } else {
+      const findings = readFileSync(filepath).toString().match(/%([^%]+)%/gi);
+      if (findings) {
+        placeholders = placeholders.concat(
+            findings.map(f => f.substring(1, f.length - 1)));
+      }
+    }
+  }
+
+  return [...new Set(placeholders)];
 }

@@ -28,7 +28,6 @@ github-fetch-starter --username 'vdegenne' --app-name 'myapp' node-typescript-st
 
 *This above command fetches the last release of the repository `vdegenne/node-typescript-starter`, unpacks the archive in a freshly new made directory called `myapp`, and prompts for the placeholders to replace if found any.*
 
----
 
 You can also specify a version :
 

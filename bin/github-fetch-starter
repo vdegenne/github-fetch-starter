@@ -2,12 +2,12 @@
 
 'use strict';
 
-var path = require('path');
-var resolve = require('resolve');
+const path = require('path');
+// var resolve = require('resolve');
 
 process.title = 'github-fetch-starter';
 
-resolve('github-fetch-starter', {basedir: process.cwd()}, function (error, libpath) {
+/* resolve('github-fetch-starter', {basedir: process.cwd()}, function (error, libpath) {
     var clipath = libpath ? path.resolve(libpath, '../cli') : '../lib/cli';
     var cli = require(clipath);
     cli.run(process.argv)
@@ -15,4 +15,9 @@ resolve('github-fetch-starter', {basedir: process.cwd()}, function (error, libpa
         console.error(e);
         process.exit(69);
     });
-});
+}); */
+
+const clipath = require('../lib/cli').run().catch(e => {
+  console.error(e.message);
+  process.exit(1);
+})

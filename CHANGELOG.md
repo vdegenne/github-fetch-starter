@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.3.0 ([commit]())
+
+* Add `readline-sync` support for asking placeholders' value directly into the command-line.
+
 ## v1.2.1 ([commit](https://github.com/vdegenne/github-fetch-starter/commit/6733b64f6b24fbfb8cbe78246d277eb994472ca6))
 
 * Add the multi-placeholder support.
