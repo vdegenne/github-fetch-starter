@@ -1,37 +1,37 @@
 [![Build Status](https://travis-ci.org/vdegenne/github-fetch-starter.svg?branch=master)](https://travis-ci.org/vdegenne/github-fetch-starter)
 [![npm](https://img.shields.io/npm/v/github-fetch-starter.svg)](https://www.npmjs.com/package/github-fetch-starter)
 
-# github-fetch-starter
+<h2 align="center"><img src="https://www.purbis.com/images/laundry/lan2.png" height="123"><br>github-fetch-starter</h2>
+<p align="center"><strong>A github starter fetcher</strong></p>
 
-A github starter fetcher.
-This is intended to fetch files (releases on github) that ease starting any project you could think of. You can make your own "starter" releases on behalf of using this tool to easily fetch those releases on your file system and start a project in a *snap*
-
-It is a better way to fetch a repo/release because to `git clone` a repository will fetch the last state of the project which can have a build failure state. Also `git clone` will fetch the `.git` directory which is used for the maintainer of the project and consider useless for the end user.
+This command-line buddy lets you fetch releases on github. You can release any releases you want but this application was made specifically for releases representing a starter. A starter is just a github release of a repository containing files that represent an initial state of a given project. This initial state may contain placeholders (of the form `%<placeholder>%`) both in filenames or in files' content. This application helps you resolve these placeholders, so not only you can start afresh but also you can make modular starters to help quickly set-up a new project.
 
 
 ## Installation
-`yarn global add github-fetch-starter`
+```bash
+sudo npm i -g github-fetch-starter
+# or
+# sudo yarn global add github-fetch-starter
+```
 
 ## Usage
 
 ```bash
-github-fetch-starter --username 'vdegenne' --app-name 'myapp' node-cli-starter
-# or
-github-fetch-starter -u 'vdegenne' -n 'myapp' node-cli-starter # for short
+github-fetch-starter --username 'vdegenne' --app-name 'myapp' node-typescript-starter
+
+# or with aliases :
+# github-fetch-starter -u vdegenne -n myapp node-cli-starter
+
+# or prompting for an application name :
+# github-fetch-starter -u vdegenne node-typescript-starter
 ```
 
-*This will fetch `vdegenne/myapp` last github release, unpack the archive in a freshly new made `myapp` directory.*
+*This above command fetches the last release of the repository `vdegenne/node-typescript-starter`, unpacks the archive in a freshly new made directory called `myapp`, and prompts for the placeholders to replace if found any.*
 
-Also you can specify a version,
+---
 
-```bash
-github-fetch-starter -u 'vdegenne' -n 'myapp' -v 'v1.1.0' node-cli-starter
-```
-
-## Note
-
-It was originally intended to fetch starters to ease starting a project but actually you can use this tool to fetch anything you want. For instance you could fetch react :
+You can also specify a version :
 
 ```bash
-github-fetch-starter -u 'facebook' react
+github-fetch-starter -u 'vdegenne' -n 'myapp' -v 'v1.1.0' node-typescript-starter
 ```
