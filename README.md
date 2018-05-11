@@ -4,7 +4,7 @@
 <h2 align="center"><img src="https://www.purbis.com/images/laundry/lan2.png" height="123"><br>github-fetch-starter</h2>
 <p align="center"><strong>A github starter fetcher</strong></p>
 
-This command-line buddy lets you fetch releases on github. You can release any releases you want but this application was made specifically for releases representing a starter. A starter is just a github release of a repository containing files that represent an initial state of a given project. This initial state may contain placeholders (of the form `%<placeholder>%`) both in filenames or in files' content. This application helps you resolve these placeholders, so not only you can start afresh but also you can make modular starters to help quickly set-up a new project.
+This command-line buddy lets you fetch releases on github. You can fetch any releases you want but this application was made specifically for releases representing a starter. A starter is just a github release of a repository containing files that represent an initial state of a given project. This initial state may contain placeholders (of the form `%<placeholder>%`) both in filenames or in files' content. This application helps you resolve these placeholders, so not only you can start afresh but also you can make modular starters to help quickly set-up a new project.
 
 
 ## Installation
