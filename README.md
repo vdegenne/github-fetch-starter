@@ -17,10 +17,10 @@ sudo npm i -g github-fetch-starter
 ## Usage
 
 ```bash
-github-fetch-starter --username 'vdegenne' --app-name 'myapp' node-typescript-starter
+github-fetch-starter --username vdegenne --app-name myapp node-typescript-starter
 
 # or with aliases :
-# github-fetch-starter -u vdegenne -n myapp node-cli-starter
+# github-fetch-starter -u vdegenne -n myapp node-typescript-starter
 
 # or prompting for an application name :
 # github-fetch-starter -u vdegenne node-typescript-starter
@@ -32,5 +32,5 @@ github-fetch-starter --username 'vdegenne' --app-name 'myapp' node-typescript-st
 You can also specify a version :
 
 ```bash
-github-fetch-starter -u 'vdegenne' -n 'myapp' -v 'v1.1.0' node-typescript-starter
+github-fetch-starter -u vdegenne -v v1.1.0 -n myapp node-typescript-starter
 ```
