@@ -1,5 +1,4 @@
 .vscode
-custom_typings
 node_modules
 src/test
 test
@@ -7,6 +6,4 @@ test
 .gitignore
 .npmignore
 .travis.yml
-CHANGELOG.md
-package-lock.json
 yarn.lock

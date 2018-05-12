@@ -171,7 +171,7 @@ export async function run() {
           placeholderYaml.default) {
         placeholderValue = placeholderYaml.default;
       }
-      // roll back on using the default placeholder if no value at last
+      // roll back on using the default placeholder if no value at last<
       if (!placeholderValue.length) {
         placeholderValue = `%${p}%`;
       }
