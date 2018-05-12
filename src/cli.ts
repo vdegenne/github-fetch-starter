@@ -133,9 +133,11 @@ export async function run() {
    * Let's replace the placeholders in the project
    */
   // we should check first if there is a placeholders configuration file.
-  fs.existsSync('.placeholders.yml');
-  const placeholdersYaml =
-      safeLoad(fs.readFileSync('.placeholders.yml').toString());
+  let placeholdersYaml;
+  if (fs.existsSync('.placeholders.yml')) {
+    placeholdersYaml =
+        safeLoad(fs.readFileSync('.placeholders.yml').toString());
+  }
 
   const placeholders = {'appname': options.appname};
 
@@ -155,7 +157,7 @@ export async function run() {
           placeholdersYaml && placeholdersYaml[p];
 
       // what question ?
-      let questionString = `${p}`;
+      let questionString = p;
       if (placeholderYaml && placeholderYaml.prompt) {
         questionString = placeholderYaml.prompt;
       }
@@ -166,12 +168,11 @@ export async function run() {
 
       // if no answer
       // but has a default
-      console.log(placeholderValue);
       if (!placeholderValue.length && placeholderYaml &&
           placeholderYaml.default) {
         placeholderValue = placeholderYaml.default;
       }
-      // roll back on using the default placeholder if no value at last<
+      // roll back on using the default placeholder if no value at last
       if (!placeholderValue.length) {
         placeholderValue = `%${p}%`;
       }
@@ -179,12 +180,16 @@ export async function run() {
       // place the value in the placeholders object.
       placeholders[p] = placeholderValue;
     }
-    console.log(placeholders);
   }
 
   // time to replace the placeholders
   await masterReplace(process.cwd(), placeholders);
   console.info('Replacing the placeholders... OK'.green);
+
+  // removing the placeholder yaml file as it is useless anymore
+  if (fs.existsSync('.placeholders.yml')) {
+    fs.unlinkSync('.placeholders.yml');
+  }
 
 
   console.info(
