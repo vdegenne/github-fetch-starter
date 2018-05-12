@@ -9,9 +9,16 @@ import * as tar from 'tar';
 import * as colors from 'colors';
 import {masterReplace, getProjectPlaceholders} from './replacer';
 import {question} from 'readline-sync';
+import {safeLoad} from 'js-yaml';
 
 // initializing ?
 colors.green('');
+
+
+export interface PlaceholderYaml {
+  prompt?: string;
+  default?: string;
+}
 
 export async function run() {
   const argsWithHelp: ArgDescriptor[] = args.concat(
@@ -125,6 +132,11 @@ export async function run() {
   /**
    * Let's replace the placeholders in the project
    */
+  // we should check first if there is a placeholders configuration file.
+  fs.existsSync('.placeholders.yml');
+  const placeholdersYaml =
+      safeLoad(fs.readFileSync('.placeholders.yml').toString());
+
   const placeholders = {'appname': options.appname};
 
   if (cliOptions.placeholder) {
@@ -136,12 +148,38 @@ export async function run() {
 
   // question for every missing placeholders
   const placeholdersInProject = await getProjectPlaceholders(process.cwd());
+
   for (const p of placeholdersInProject) {
     if (!(p in placeholders)) {
-      placeholders[p] = question(
-          `${p}: `,
+      let placeholderYaml: PlaceholderYaml =
+          placeholdersYaml && placeholdersYaml[p];
+
+      // what question ?
+      let questionString = `${p}`;
+      if (placeholderYaml && placeholderYaml.prompt) {
+        questionString = placeholderYaml.prompt;
+      }
+      // question <=> value
+      let placeholderValue = question(
+          `${questionString}: `,
           {hideEchoBack: p.match(/passwd|password/gi) ? true : false});
+
+      // if no answer
+      // but has a default
+      console.log(placeholderValue);
+      if (!placeholderValue.length && placeholderYaml &&
+          placeholderYaml.default) {
+        placeholderValue = placeholderYaml.default;
+      }
+      // roll back on using the default placeholder if no value at last
+      if (!placeholderValue.length) {
+        placeholderValue = `%${p}%`;
+      }
+
+      // place the value in the placeholders object.
+      placeholders[p] = placeholderValue;
     }
+    console.log(placeholders);
   }
 
   // time to replace the placeholders
