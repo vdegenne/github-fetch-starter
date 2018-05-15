@@ -46,7 +46,6 @@ describe('Replacer', () => {
 
 
   describe('General replacement', () => {
-
     /**
      * Setup
      */
@@ -114,6 +113,10 @@ describe('Replacer', () => {
     it('finds all placeholders in project (distinct)', async() => {
       const findings = await replacer.getProjectPlaceholders(tempRoot);
       assert.deepEqual(findings, ['appname', 'testvalue']);
+    });
+
+    it('ignores multi-line not placeholders', async() => {
+      const findings = await replacer.getProjectPlaceholders(tempRoot);
     });
   });
 });

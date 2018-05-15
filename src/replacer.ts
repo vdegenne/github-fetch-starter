@@ -150,7 +150,7 @@ export async function getProjectPlaceholders(path: string): Promise<string[]> {
       placeholders =
           placeholders.concat(await getProjectPlaceholders(filepath));
     } else {
-      const findings = readFileSync(filepath).toString().match(/%([^%]+)%/gi);
+      const findings = readFileSync(filepath).toString().match(/%([^%\n]+)%/gi);
       if (findings) {
         placeholders = placeholders.concat(
             findings.map(f => f.substring(1, f.length - 1)));
