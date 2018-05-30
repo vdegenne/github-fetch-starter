@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.6.0 [30-05-2018]
+
+* Add `strict` support in `.placeholders.yml` to force github-fetch-starter to only prompt for placeholders in the file.
+
 ## v1.5.2
 
 * fixes the multi-line wrong placeholders (in case of a css using "%" symbols for example).

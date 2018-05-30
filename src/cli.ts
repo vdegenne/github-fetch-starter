@@ -133,13 +133,21 @@ export async function run() {
    * Let's replace the placeholders in the project
    */
   // we should check first if there is a placeholders configuration file.
-  let placeholdersYaml;
+  let placeholdersYaml: any;
   if (fs.existsSync('.placeholders.yml')) {
     placeholdersYaml =
         safeLoad(fs.readFileSync('.placeholders.yml').toString());
   }
 
+  // strict mode ?
+  let strict = false;
+  if (placeholdersYaml && placeholdersYaml.strict) {
+    strict = placeholdersYaml.strict;
+  }
+
+  // placeholders object
   const placeholders = {'appname': options.appname};
+  const placeholdersInProject = await getProjectPlaceholders(process.cwd());
 
   if (cliOptions.placeholder) {
     for (const p of cliOptions.placeholder) {
@@ -149,9 +157,12 @@ export async function run() {
   }
 
   // question for every missing placeholders
-  const placeholdersInProject = await getProjectPlaceholders(process.cwd());
-
   for (const p of placeholdersInProject) {
+    if (strict && placeholdersYaml && !(p in placeholdersYaml)) {
+      // the placeholder is not in the yaml file (ignoring)
+      continue;
+    }
+
     if (!(p in placeholders)) {
       let placeholderYaml: PlaceholderYaml =
           placeholdersYaml && placeholdersYaml[p];
